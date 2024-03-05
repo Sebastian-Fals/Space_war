@@ -16,15 +16,7 @@ BLUISH_GREY = (86, 100, 135, 53)
 #----------------------------
 
 #Funciones
-def get_angle(origin, destination):
-    """Returns angle in radians from origin to destination.
-    This is the angle that you would get if the points were
-    on a cartesian grid. Arguments of (0,0), (1, -1)
-    return .25pi(45 deg) rather than 1.75pi(315 deg).
-    """
-    x_dist = destination[0] - origin[0]
-    y_dist = destination[1] - origin[1]
-    return atan2(-y_dist, x_dist) % (2 * pi)
+
 #----------------------------
 
 #Clases
@@ -43,7 +35,7 @@ class Player(GameEntity):
         self.velocityX = 0
         self.velocityY = 0
 
-    def update(self):
+    def update(self, sprite, sizeX, sizeY):
         self.velocityX = 0
         self.velocityY = 0
 
@@ -61,6 +53,28 @@ class Player(GameEntity):
 
         self.rect.x += self.velocityX
         self.rect.y += self.velocityY
+
+        #Rotacion del personaje hacia el mouse
+        mouse_pos = mouse.get_pos()
+        angle = degrees(atan2((mouse_pos[1] - self.rect.centery), (mouse_pos[0] - self.rect.centerx))) + 90
+        self.image = image.load(sprite).convert_alpha()
+        self.image = transform.rotate(self.image, -angle)
+        self.rect = self.image.get_rect(center=self.rect.center)
+
+        print(angle)
+
+        #Distancia en x
+        #mouse_pos[0] - self.rect.centerx 
+
+        #Distancia en y
+        #mouse_pos[1] - self.rect.centery
+
+        #Distancia total
+        #sqrt(((mouse_pos[0] - self.rect.centerx) ** 2) + ((mouse_pos[1] - self.rect.centery) ** 2))
+
+        #Angulo entre el player, y el mouse
+        #degrees(atan2((mouse_pos[1] - self.rect.centery), (mouse_pos[0] - self.rect.centerx)))
+
 
         #Limites en la pantalla
         if self.rect.left < 0:
@@ -95,7 +109,7 @@ while running:
     screen.fill(DARK_BLUE)
 
     #Logica principal del juego
-    All_sprite_in_game.update() 
+    player.update(player_sprite, 40, 40)
     #-----------------
 
     #Configuración de la pantalla (In-Game)
