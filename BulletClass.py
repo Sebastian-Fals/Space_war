@@ -2,7 +2,7 @@ from pygame import *
 from math import *
 
 class Bullet(sprite.Sprite):
-    def __init__(self, location, angle, sprite, speed):
+    def __init__(self, location, angle, sprite, speed, bullet_target):
         super().__init__()
         self.image = image.load(sprite).convert_alpha()
         self.image = transform.scale(self.image, (20, 20))
@@ -15,6 +15,7 @@ class Bullet(sprite.Sprite):
         self.speed_magnitude = speed
         self.speed = (self.speed_magnitude* cos(self.angle),
                       self.speed_magnitude* sin(self.angle))
+        self.bullet_target = bullet_target
         
     def update(self, screen_rect):
         self.move[0] += self.speed[0]
