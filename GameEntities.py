@@ -6,32 +6,33 @@ from queue import *
 from BulletClass import Bullet
 
 class GameEntity(sprite.Sprite):
-    def __init__(self, sprite, bullet_sprite, position, sizeX, sizeY, vida):
+    def __init__(self, sprite, bullet_sprite, position, size, vida):
         super().__init__()
-        self.sizeX = sizeX
-        self.sizeY = sizeY
-        self.image = sprite
+        self.size = size
+        self.originalSprite = sprite
+        self.image = self.originalSprite
+        self.image = transform.scale(self.image, size)
+        self.position = position
         self.rect = self.image.get_rect()
-        self.rect.center = (position[0], position[1])
+        self.rect.center = (self.position[0], self.position[1])
         self.vida = vida
         self.bullet_sprite = bullet_sprite
         self.screen_size = 0
 
 class Player(GameEntity):
-    def __init__(self, sprite, bullet_sprite, position, sizeX, sizeY, vida):
-        super().__init__(sprite, bullet_sprite, position, sizeX, sizeY, vida)
+    def __init__(self, sprite, bullet_sprite, position, size, vida):
+        super().__init__(sprite, bullet_sprite, position, size, vida)
         self.velocityX = 0
         self.velocityY = 0
         self.angle = 0
         self.mouse_pos = 0
-        #Define a quien va a dañar la bala que se spawnea
-        self.target = "enemies"
+        self.target = "enemies" #Define a quien va a dañar la bala que se spawnea
 
-    def update(self, sprite,  mouse_pos, screen_rect):
+    def update(self, deltaTime,  mouse_pos, screen_size):
         self.velocityX = 0
         self.velocityY = 0
         self.mouse_pos = mouse_pos
-        self.screen_size = screen_rect
+        self.screen_size = screen_size
 
         teclas = key.get_pressed()
 
@@ -45,12 +46,12 @@ class Player(GameEntity):
         if teclas[K_d]:
             self.velocityX = 12.5
 
-        self.rect.x += self.velocityX
-        self.rect.y += self.velocityY
+        self.rect.x += self.velocityX * deltaTime
+        self.rect.y += self.velocityY * deltaTime
 
         #Rotacion del personaje hacia el mouse
         self.angle = degrees(atan2((self.mouse_pos[1] - self.rect.centery), (self.mouse_pos[0] - self.rect.centerx))) + 90
-        self.image = sprite
+        self.image = self.originalSprite
         self.image = transform.rotate(self.image, - self.angle)
         self.rect = self.image.get_rect(center = self.rect.center)
 
@@ -85,8 +86,8 @@ class Player(GameEntity):
 
 #Esta clase es para todos los tipos de enemigos del juego
 class Enemies(GameEntity):
-    def __init__(self, sprite, bullet_sprite, position, sizeX, sizeY, vida, enemy_id):
-        super().__init__(sprite, bullet_sprite, position, sizeX, sizeY, vida)
+    def __init__(self, sprite, bullet_sprite, position, size, vida, enemy_id):
+        super().__init__(sprite, bullet_sprite, position, size, vida)
         self.enemy_id = enemy_id
         #Bullet interval sirve para calcular el intervalo de disparo de las balas
         self.bullet_interval = 0
@@ -108,7 +109,7 @@ class Enemies(GameEntity):
             self.image = image.load("Assets/circular_enemy.png").convert_alpha()
             self.image = transform.scale(self.image, (40, 40))
             self.rect = self.image.get_rect()
-            self.rect.center = (300, 300)
+            self.rect.center = self.position
             self.bullet_interval = 0.3
             self.bullet_vertices = 10
             self.suma_del_angulo = 360/self.bullet_vertices
@@ -128,7 +129,7 @@ class Enemies(GameEntity):
     def shoot(self, objects):
         if self.enemy_id == "enemigo_patron_circular":
             for _ in range(self.bullet_vertices):
-                self.shoot_queue.put(Bullet(self.rect.center, self.angulo_actual, self.bullet_sprite, 15, self.target))
+                self.shoot_queue.put(Bullet(self.rect.center, self.angulo_actual, self.bullet_sprite, 10, self.target))
                 self.angulo_actual += self.suma_del_angulo
 
             # Agregar las balas a la lista principal fuera del hilo

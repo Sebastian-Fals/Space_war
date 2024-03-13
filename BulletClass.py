@@ -17,9 +17,9 @@ class Bullet(sprite.Sprite):
                       self.speed_magnitude* sin(self.angle))
         self.bullet_target = bullet_target
         
-    def update(self, screen_rect):
-        self.move[0] += self.speed[0]
-        self.move[1] += self.speed[1]
+    def update(self, screen_rect, deltaTime):
+        self.move[0] += self.speed[0] * deltaTime
+        self.move[1] += self.speed[1] * deltaTime
         self.rect.topleft = self.move
         self.remove(screen_rect)
 
