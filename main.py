@@ -3,19 +3,20 @@ from math import *
 import time as tm
 
 #Se importan las clases y demás
-from GameEntities import Player, Enemies
+from GameEntities import Player
 from funciones import get_image, responsiveSizeAndPosition
+from EnemyGenerator import EnemyGenerator, SpawnPoint
 
 #Se inicia el programa
 init()
 
 #Configuración de la pantalla
-resolucion = (1920, 1080)
-screen = display.set_mode(resolucion, FULLSCREEN)
+monitor_size = [display.Info().current_w, display.Info().current_h]
+resolucion = (1280, 720)
+screen = display.set_mode(resolucion)
+screen_size = screen.get_size()
 clock = time.Clock()
 #----------------------------
-
-text_font = font.Font("PixelifySans-VariableFont_wght.ttf", 30)
 
 #Colores
 WHITE = (255, 255, 255, 255)
@@ -31,10 +32,21 @@ playerSheet = image.load("Assets/SpaceShip_sheet.png").convert_alpha()
 bulletsSheet = image.load("Assets/Bullets_sheet.png").convert_alpha()
 #----------------------------
 
+#Posibles posiciones de un enemigo
+enemyPos = [SpawnPoint((responsiveSizeAndPosition(screen_size, 0, 25), responsiveSizeAndPosition(screen_size, 1, 10))), 
+            SpawnPoint((responsiveSizeAndPosition(screen_size, 0, 75), responsiveSizeAndPosition(screen_size, 1, 10))),
+            SpawnPoint((responsiveSizeAndPosition(screen_size, 0, 25), responsiveSizeAndPosition(screen_size, 1, 90))),
+            SpawnPoint((responsiveSizeAndPosition(screen_size, 0, 75), responsiveSizeAndPosition(screen_size, 1, 90))),
+            SpawnPoint((responsiveSizeAndPosition(screen_size, 0, 50), responsiveSizeAndPosition(screen_size, 1, 20))),
+            SpawnPoint((responsiveSizeAndPosition(screen_size, 0, 50), responsiveSizeAndPosition(screen_size, 1, 80))),
+            SpawnPoint((responsiveSizeAndPosition(screen_size, 0, 10), responsiveSizeAndPosition(screen_size, 1, 50))),
+            SpawnPoint((responsiveSizeAndPosition(screen_size, 0, 90), responsiveSizeAndPosition(screen_size, 1, 50)))]
+
+enemyID = ["enemigo_patron_circular"]
+
 #Objetos
-player = Player(get_image(playerSheet, 0, 52, 52, BLACK), get_image(bulletsSheet, 0, 24, 24, BLACK), (500, 500), (40, 40), 10)
-enemie = Enemies(image.load("Assets/circular_enemy.png").convert_alpha(), get_image(bulletsSheet, 1, 24, 24, BLACK), (300, 300), (40, 40), 10, "enemigo_patron_circular")
-enemies.add(enemie)
+player = Player(get_image(playerSheet, 0, 52, 52, BLACK), get_image(bulletsSheet, 0, 24, 24, BLACK), (responsiveSizeAndPosition(screen_size, 0, 50), responsiveSizeAndPosition(screen_size, 1, 90)), (responsiveSizeAndPosition(screen_size, 0, 3), responsiveSizeAndPosition(screen_size, 0, 3)), 10)
+enemyGenerator = EnemyGenerator(enemies, enemyPos, 1, enemyID, get_image(bulletsSheet, 1, 24, 24, BLACK))
 #----------------------------
 
 last_time = tm.time()#Esta variabe sirve para calcular el deltaTime
@@ -49,7 +61,7 @@ while running:
     screen_size = screen.get_size()
 
     #Fonts
-    fps_font = font.Font("PixelifySans-VariableFont_wght.ttf", int(responsiveSizeAndPosition(screen_size, 1, 2)))
+    fps_font = font.Font("PixelifySans-VariableFont_wght.ttf", int(responsiveSizeAndPosition(screen_size, 1, 2.5)))
 
     #DeltaTime
     dt = tm.time() - last_time
@@ -62,12 +74,15 @@ while running:
     #Muestra los fps
     fps = clock.get_fps()
     fps_text = fps_font.render("FPS: " + str(int(fps//1)), False, WHITE)
-    screen.blit(fps_text, (responsiveSizeAndPosition(screen_size, 0, 96), responsiveSizeAndPosition(screen_size, 1, 1)))
+    screen.blit(fps_text, (responsiveSizeAndPosition(screen_size, 0, 94.5), responsiveSizeAndPosition(screen_size, 0, 0.5)))
 
     #Event manager
     for e in event.get():
         if e.type == QUIT:
             running = False
+        if e.type == KEYDOWN:
+            if e.key == K_f:
+                enemyGenerator.generateEnemy()
         #Para que funcione el disparo
         player.Shoot(e, bullets)
 
@@ -88,6 +103,8 @@ while running:
                 b.kill()
 
         #Update de los objetos de la escena
+    for position in enemyPos:
+        position.update(enemies)            
     player.update(dt, mouse_pos, screen_size)
     enemies.update(bullets)
     bullets.update(screen_rect, dt)

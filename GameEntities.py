@@ -8,8 +8,7 @@ from BulletClass import Bullet
 class GameEntity(sprite.Sprite):
     def __init__(self, sprite, bullet_sprite, position, size, vida):
         super().__init__()
-        self.size = size
-        self.originalSprite = sprite
+        self.originalSprite = transform.scale(sprite, size)
         self.image = self.originalSprite
         self.image = transform.scale(self.image, size)
         self.position = position
@@ -100,11 +99,10 @@ class Enemies(GameEntity):
         self.shoot_queue = Queue()
         #Define a quien va a dañar la bala que se spawnea
         self.target = "player"
+        self.loadEnemy()
 
-    def update(self, objects):
-        #Esta condicional depende del tipo de enemigos que se genera
+    def loadEnemy(self):
         if self.enemy_id == "enemigo_patron_circular":
-            
             #Se configuran las opciones iniciales del enemigo
             self.image = image.load("Assets/circular_enemy.png").convert_alpha()
             self.image = transform.scale(self.image, (40, 40))
@@ -114,6 +112,9 @@ class Enemies(GameEntity):
             self.bullet_vertices = 10
             self.suma_del_angulo = 360/self.bullet_vertices
 
+    def update(self, objects):
+        #Esta condicional depende del tipo de enemigos que se genera
+        if self.enemy_id == "enemigo_patron_circular":
             now = tm.time()
             if now - self.ultimo_disparo > self.bullet_interval:
                 # Disparar balas en un hilo separado
