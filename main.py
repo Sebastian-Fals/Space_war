@@ -1,5 +1,6 @@
 from pygame import *
 from math import *
+import sys
 import time as tm
 
 #Se importan las clases y demás
@@ -26,6 +27,7 @@ DARK_BLUE = (0, 1, 35, 14)
 #Grupos
 bullets = sprite.Group()
 enemies = sprite.Group()
+playerGroup = sprite.Group()
 #----------------------------
 #Sprite sheets
 playerSheet = image.load("Assets/SpaceShip_sheet.png").convert_alpha()
@@ -52,7 +54,8 @@ enemyID = ["enemigo_patron_circular",
 
 #Objetos
 player = Player(get_image(playerSheet, 0, 52, 52, BLACK), bullet_array[0], (responsiveSizeAndPosition(screen_size, 0, 50), responsiveSizeAndPosition(screen_size, 1, 90)), (responsiveSizeAndPosition(screen_size, 0, 3), responsiveSizeAndPosition(screen_size, 0, 3)), 10)
-enemyGenerator = EnemyGenerator(enemies, enemyPos, 0, enemyID, bullet_array, "easy")
+playerGroup.add(player)
+enemyGenerator = EnemyGenerator(enemies, enemyPos, 0, enemyID, bullet_array, "easy", screen, screen_size)
 #----------------------------
 
 last_time = tm.time()#Esta variabe sirve para calcular el deltaTime
@@ -67,7 +70,7 @@ while running:
     screen_size = screen.get_size()
 
     #Fonts
-    fps_font = font.Font("PixelifySans-VariableFont_wght.ttf", int(responsiveSizeAndPosition(screen_size, 1, 2.5)))
+    fps_font = font.Font("Assets/Minecraft.ttf", int(responsiveSizeAndPosition(screen_size, 1, 2.5)))
 
     #DeltaTime
     dt = tm.time() - last_time
@@ -79,13 +82,14 @@ while running:
 
     #Muestra los fps
     fps = clock.get_fps()
-    fps_text = fps_font.render("FPS: " + str(int(fps//1)), False, WHITE)
-    screen.blit(fps_text, (responsiveSizeAndPosition(screen_size, 0, 94.5), responsiveSizeAndPosition(screen_size, 0, 0.5)))
+    fps_text = fps_font.render("FPS: " + str(int(fps//1)), True, WHITE)
+    screen.blit(fps_text, fps_text.get_rect(center = (responsiveSizeAndPosition(screen_size, 0, 97), responsiveSizeAndPosition(screen_size, 0, 1))))
 
     #Event manager
     for e in event.get():
         if e.type == QUIT:
-            running = False
+            quit()
+            sys.exit()
         if e.type == KEYDOWN:
             if e.key == K_f:
                 enemyGenerator.generateEnemy()
@@ -96,10 +100,10 @@ while running:
 
     screen_rect = display.get_surface().get_rect()
 
-        #Posicion del mouse
+    #Posicion del mouse
     mouse_pos = mouse.get_pos()
 
-        #Logica de las colisiones
+    #Logica de las colisiones
     bullets_to_enemies = sprite.groupcollide(enemies, bullets, False, False)
 
     for enemy, bullet in bullets_to_enemies.items():
@@ -108,17 +112,25 @@ while running:
                 enemy.take_damage(1)
                 b.kill()
 
+    bullet_to_player = sprite.groupcollide(playerGroup, bullets, False, False)
+    for player, bullet in bullet_to_player.items():
+        for b in bullet:
+            if b.bullet_target == "player":
+                player.take_damage(1)
+                player.isDead = True
+                b.kill()
+
         #Update de los objetos de la escena
     for position in enemyPos:
         position.update(enemies)           
-    player.update(dt, mouse_pos, screen_size)
+    playerGroup.update(dt, mouse_pos, screen_size)
     enemies.update(bullets)
     enemyGenerator.update()
     bullets.update(screen_rect, dt)
     #-----------------
 
     #Configuración de la pantalla (In-Game)
-    screen.blit(player.image, player.rect) #Se dibuja el player en pantalla
+    playerGroup.draw(screen) #Se dibuja el player en pantalla
     bullets.draw(screen)
     enemies.draw(screen)
     display.flip()
@@ -127,3 +139,4 @@ while running:
     #-----------------
 
 quit()
+sys.exit()

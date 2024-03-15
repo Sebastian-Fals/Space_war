@@ -17,6 +17,9 @@ class GameEntity(sprite.Sprite):
         self.vida = vida
         self.bullet_sprite = bullet_sprite
         self.screen_size = 0
+        
+    def take_damage(self, amount):
+        self.vida -= amount
 
 class Player(GameEntity):
     def __init__(self, sprite, bullet_sprite, position, size, vida):
@@ -26,6 +29,8 @@ class Player(GameEntity):
         self.angle = 0
         self.mouse_pos = 0
         self.target = "enemies" #Define a quien va a dañar la bala que se spawnea
+        self.vida = 1
+        self.isDead = False
 
     def update(self, deltaTime,  mouse_pos, screen_size):
         self.velocityX = 0
@@ -76,11 +81,14 @@ class Player(GameEntity):
             self.rect.top = 0
         if self.rect.bottom > self.screen_size[1]:
             self.rect.bottom = self.screen_size[1]
+        
+        if self.vida == 0:
+            self.kill()
 
     #Funcion para disparar la o las balas del player
     #Se ejecuta exclusivamente en el for de los eventos en el loop principal
     def Shoot(self, event, objects):
-        if event.type == MOUSEBUTTONDOWN and event.button == 1:
+        if event.type == MOUSEBUTTONDOWN and event.button == 1 and not self.isDead:
             objects.add(Bullet(self.rect.center, self.angle, self.bullet_sprite, 20, self.target))
 
 #Esta clase es para todos los tipos de enemigos del juego
@@ -154,6 +162,3 @@ class Enemies(GameEntity):
             # Agregar las balas a la lista principal fuera del hilo
             while not self.shoot_queue.empty():
                 objects.add(self.shoot_queue.get())
-
-    def take_damage(self, amount):
-        self.vida -= amount

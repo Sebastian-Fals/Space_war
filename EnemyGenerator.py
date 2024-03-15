@@ -3,6 +3,7 @@ from pygame import *
 from random import *
 from threading import *
 from GameEntities import Enemies
+from funciones import responsiveSizeAndPosition
 
 class SpawnPoint():
     def __init__(self, position):
@@ -23,7 +24,9 @@ class SpawnPoint():
         
 
 class EnemyGenerator():
-    def __init__(self, group,  spawnPoints, enemyCount, enemy_IDs, bulletSprite, difficulty):
+    def __init__(self, group,  spawnPoints, enemyCount, enemy_IDs, bulletSprite, difficulty, screen, screenSize):
+        self.screen = screen
+        self.screenSize = screenSize
         self.spawnPoints = spawnPoints
         self.enemyCount = enemyCount
         self.enemy_IDs = enemy_IDs
@@ -31,12 +34,18 @@ class EnemyGenerator():
         self.group = group
         self.difficulty = difficulty
         self.lock = Lock()
-        self.has_spawned = False  # Bandera para rastrear si se ha ejecutado el hilo
         self.enemies_generated = 0  # Contador de enemigos generados
+        self.actualwave = 1 #Control de la oleada actual
+        self.waveInText = 0
+        self.waveFont = font.Font("Assets/Minecraft.ttf", int(responsiveSizeAndPosition(screenSize, 1, 10)))
+        self.waveText = self.waveFont.render("Wave " + str(self.waveInText), True, (255, 255, 255, 255))
+        self.any_spawn_points_occupied = 0
 
     def update(self):
-        any_spawn_points_occupied = all(spawn_point.canSpawn for spawn_point in self.spawnPoints)
-        if any_spawn_points_occupied:
+        self.any_spawn_points_occupied = all(spawn_point.canSpawn for spawn_point in self.spawnPoints)
+        if self.any_spawn_points_occupied:
+            self.waveText = self.waveFont.render("Wave " + str(self.waveInText), False, (255, 255, 255, 255))
+            self.screen.blit(self.waveText, self.waveText.get_rect(center = ((responsiveSizeAndPosition(self.screenSize, 0, 50), responsiveSizeAndPosition(self.screenSize, 1, 50)))))
             self.setDifficulty()
             self.enemies_generated = 0
             # Utilizar threading para generar enemigos sin bloquear el hilo principal
@@ -45,27 +54,31 @@ class EnemyGenerator():
 
     def generateEnemies(self):
         with self.lock:
-            while self.enemies_generated < self.enemyCount:
-                for position in self.spawnPoints:
-                    position.update(self.group)
-                # Verifica si todos los spawnPoints están ocupados
-                all_spawn_points_occupied = all(not spawn_point.canSpawn for spawn_point in self.spawnPoints)
-                if all_spawn_points_occupied:
-                    return
+            if self.any_spawn_points_occupied:
+                self.actualwave += 1
+                tm.sleep(2)
+                while self.enemies_generated < self.enemyCount:
+                    for position in self.spawnPoints:
+                        position.update(self.group)
+                    # Verifica si todos los spawnPoints están ocupados
+                    all_spawn_points_occupied = all(not spawn_point.canSpawn for spawn_point in self.spawnPoints)
+                    if all_spawn_points_occupied:
+                        return
 
-                randomPosition = randint(0, (len(self.spawnPoints) - 1))
-                randomID = randint(0, (len(self.enemy_IDs) - 1))
-                while self.spawnPoints[randomPosition].canSpawn == False:
                     randomPosition = randint(0, (len(self.spawnPoints) - 1))
-                if self.spawnPoints[randomPosition].canSpawn == True:
-                    self.group.add(Enemies(image.load("Assets/circular_enemy.png").convert_alpha(), self.bulletSprite, self.spawnPoints[randomPosition].position, (40, 40), 10, self.enemy_IDs[randomID]))
-                tm.sleep(0.5)
-                self.enemies_generated += 1
+                    randomID = randint(0, (len(self.enemy_IDs) - 1))
+                    while self.spawnPoints[randomPosition].canSpawn == False:
+                        randomPosition = randint(0, (len(self.spawnPoints) - 1))
+                    if self.spawnPoints[randomPosition].canSpawn == True:
+                        self.group.add(Enemies(image.load("Assets/circular_enemy.png").convert_alpha(), self.bulletSprite, self.spawnPoints[randomPosition].position, (40, 40), 10, self.enemy_IDs[randomID]))
+                    tm.sleep(0.5)
+                    self.enemies_generated += 1
+                    self.waveInText = self.actualwave
 
     def setDifficulty(self):
         if self.difficulty == "easy":
-            self.enemyCount = randint(1, 3)
+            self.enemyCount = randint(int(1 + (self.actualwave * 0.2)), int(3 + (self.actualwave * 0.2)))
         if self.difficulty == "medium":
-            self.enemyCount = randint(2, 5)
+            self.enemyCount = randint(int(2 + (self.actualwave * 0.2)), int(5 + (self.actualwave * 0.2)))
         if self.difficulty == "hard":
-            self.enemyCount = randint(4, 8)
+            self.enemyCount = randint(int(4 + (self.actualwave * 0.2)), int(8 + (self.actualwave * 0.2)))
