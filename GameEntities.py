@@ -82,7 +82,8 @@ class Player(GameEntity):
         if self.rect.bottom > self.screen_size[1]:
             self.rect.bottom = self.screen_size[1]
         
-        if self.vida == 0:
+        if self.vida <= 0:
+            self.isDead = True
             self.kill()
 
     #Funcion para disparar la o las balas del player
