@@ -1,2 +1,6 @@
 enemigo_patron_circular
+enemigo_patron_circular_alternado
 enemigo_patron_espiral
+enemigo_patron_espiral_alternado
+enemigo_patron_estrella
+enemigo_patron_spray

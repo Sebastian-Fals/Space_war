@@ -74,6 +74,8 @@ class EnemyGenerator():
                     tm.sleep(0.5)
                     self.enemies_generated += 1
                     self.waveInText = self.actualwave
+                for enemy in self.group:
+                    enemy.canShoot = True                    
 
     def setDifficulty(self):
         if self.difficulty == "easy":

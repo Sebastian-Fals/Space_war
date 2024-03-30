@@ -31,6 +31,8 @@ class Player(GameEntity):
         self.target = "enemies" #Define a quien va a dañar la bala que se spawnea
         self.vida = 1
         self.isDead = False
+        self.shootSound = mixer.Sound("Assets/laser_beam.mp3")
+        self.shootSound.set_volume(0.3)
 
     def update(self, deltaTime,  mouse_pos, screen_size):
         self.velocityX = 0
@@ -42,13 +44,13 @@ class Player(GameEntity):
 
         #Movimiento con WASD
         if teclas[K_w]:
-            self.velocityY = -12.5
+            self.velocityY = -6
         if teclas[K_s]:
-            self.velocityY = 12.5
+            self.velocityY = 6
         if teclas[K_a]:
-            self.velocityX = -12.5
+            self.velocityX = -6
         if teclas[K_d]:
-            self.velocityX = 12.5
+            self.velocityX = 6
 
         self.rect.x += self.velocityX * deltaTime
         self.rect.y += self.velocityY * deltaTime
@@ -90,6 +92,7 @@ class Player(GameEntity):
     #Se ejecuta exclusivamente en el for de los eventos en el loop principal
     def Shoot(self, event, objects):
         if event.type == MOUSEBUTTONDOWN and event.button == 1 and not self.isDead:
+            self.shootSound.play()
             objects.add(Bullet(self.rect.center, self.angle, self.bullet_sprite, 20, self.target))
 
 #Esta clase es para todos los tipos de enemigos del juego
@@ -108,6 +111,9 @@ class Enemies(GameEntity):
         self.shoot_queue = Queue()
         #Define a quien va a dañar la bala que se spawnea
         self.target = "player"
+        #El enemigo ya puede empezar a disparar?
+        self.canShoot = 0
+
         self.loadEnemy()
 
     def loadEnemy(self):
@@ -120,6 +126,17 @@ class Enemies(GameEntity):
             self.bullet_interval = 0.3
             self.bullet_vertices = 10
             self.suma_del_angulo = 360/self.bullet_vertices
+            
+        if self.enemy_id == "enemigo_patron_circular_alternado":
+            #Se configuran las opciones iniciales del enemigo
+            self.image = image.load("Assets/circular_enemy.png").convert_alpha()
+            self.image = transform.scale(self.image, (40, 40))
+            self.rect = self.image.get_rect()
+            self.rect.center = self.position
+            self.bullet_interval = 0.3
+            self.bullet_vertices = 10
+            self.suma_del_angulo = 360/self.bullet_vertices
+
         if self.enemy_id == "enemigo_patron_espiral":
             #Se configuran las opciones iniciales del enemigo
             self.image = image.load("Assets/circular_enemy.png").convert_alpha()
@@ -129,15 +146,46 @@ class Enemies(GameEntity):
             self.bullet_interval = 0.3
             self.bullet_vertices = 3
             self.suma_del_angulo = 360/self.bullet_vertices
+        
+        if self.enemy_id == "enemigo_patron_espiral_alternado":
+            #Se configuran las opciones iniciales del enemigo
+            self.image = image.load("Assets/circular_enemy.png").convert_alpha()
+            self.image = transform.scale(self.image, (40, 40))
+            self.rect = self.image.get_rect()
+            self.rect.center = self.position
+            self.bullet_interval = 0.3
+            self.bullet_vertices = 5
+            self.suma_del_angulo = 360/self.bullet_vertices
+        
+        if self.enemy_id == "enemigo_patron_estrella":
+            #Se configuran las opciones iniciales del enemigo
+            self.image = image.load("Assets/circular_enemy.png").convert_alpha()
+            self.image = transform.scale(self.image, (40, 40))
+            self.rect = self.image.get_rect()
+            self.rect.center = self.position
+            self.bullet_interval = 1
+            self.bullet_vertices = 30
+            self.suma_del_angulo = 360/self.bullet_vertices
+        
+        if self.enemy_id == "enemigo_patron_spray":
+            #Se configuran las opciones iniciales del enemigo
+            self.image = image.load("Assets/circular_enemy.png").convert_alpha()
+            self.image = transform.scale(self.image, (40, 40))
+            self.rect = self.image.get_rect()
+            self.rect.center = self.position
+            self.bullet_interval = 1
+            self.bullet_vertices = 30
+            self.suma_del_angulo = 360/self.bullet_vertices
 
     def update(self, objects):
         #Esta condicional depende del tipo de enemigos que se genera
         now = tm.time()
-        if now - self.ultimo_disparo > self.bullet_interval:
-            # Disparar balas en un hilo separado
-            shoot_thread = Thread(target=self.shoot, args=(objects,))
-            shoot_thread.start()
-            self.ultimo_disparo = now
+        if self.canShoot == True:            
+            if now - self.ultimo_disparo > self.bullet_interval:
+                # Disparar balas en un hilo separado
+                shoot_thread = Thread(target=self.shoot, args=(objects,))
+                shoot_thread.start()
+                self.ultimo_disparo = now
 
         #Se destruye el enemigo
         if self.vida == 0:
@@ -153,12 +201,55 @@ class Enemies(GameEntity):
             # Agregar las balas a la lista principal fuera del hilo
             while not self.shoot_queue.empty():
                 objects.add(self.shoot_queue.get())
+
+        if self.enemy_id == "enemigo_patron_circular_alternado":
+            for _ in range(self.bullet_vertices):
+                self.shoot_queue.put(Bullet(self.rect.center, self.angulo_actual, self.bullet_sprite[3], 5, self.target))
+                self.angulo_actual += self.suma_del_angulo
+            
+            self.angulo_actual += self.suma_del_angulo * 1.5
+
+            # Agregar las balas a la lista principal fuera del hilo
+            while not self.shoot_queue.empty():
+                objects.add(self.shoot_queue.get())
+
         if self.enemy_id == "enemigo_patron_espiral":
             for _ in range(self.bullet_vertices):
                 self.shoot_queue.put(Bullet(self.rect.center, self.angulo_actual, self.bullet_sprite[2], 5, self.target))
                 self.angulo_actual += self.suma_del_angulo
 
             self.angulo_actual += 20
+
+            # Agregar las balas a la lista principal fuera del hilo
+            while not self.shoot_queue.empty():
+                objects.add(self.shoot_queue.get())
+        
+        if self.enemy_id == "enemigo_patron_espiral_alternado":
+            for _ in range(self.bullet_vertices):
+                self.shoot_queue.put(Bullet(self.rect.center, self.angulo_actual, self.bullet_sprite[6], 5, self.target))
+                self.angulo_actual += self.suma_del_angulo
+
+            self.angulo_actual -= 20
+
+            # Agregar las balas a la lista principal fuera del hilo
+            while not self.shoot_queue.empty():
+                objects.add(self.shoot_queue.get())
+        
+        if self.enemy_id == "enemigo_patron_estrella":
+            for _ in range(self.bullet_vertices):
+                self.shoot_queue.put(Bullet(self.rect.center, self.angulo_actual, self.bullet_sprite[5], 1.5*sin(50*self.angulo_actual * (pi/360)) + 5, self.target))
+                self.angulo_actual += self.suma_del_angulo
+            self.angulo_actual = 0
+
+            # Agregar las balas a la lista principal fuera del hilo
+            while not self.shoot_queue.empty():
+                objects.add(self.shoot_queue.get())
+        
+        if self.enemy_id == "enemigo_patron_spray":
+            for _ in range(self.bullet_vertices):
+                self.shoot_queue.put(Bullet(self.rect.center, self.angulo_actual, self.bullet_sprite[4], abs(sin(500*self.angulo_actual * (pi/360)) + 5), self.target))
+                self.angulo_actual += self.suma_del_angulo
+            self.angulo_actual = 0
 
             # Agregar las balas a la lista principal fuera del hilo
             while not self.shoot_queue.empty():
