@@ -17,6 +17,15 @@ from Assets.Python.funciones import get_image, tamanoDinamico, save
 from Assets.Python.EnemyGenerator import EnemyGenerator, SpawnPoint
 from Assets.Python.UI_classes import Estrellas, Boton
 
+# Un path para todos los assets
+ASSETS: str = "Assets/"
+
+# Compruba si assets existe
+if os.path.exists("Assets"):
+    ASSETS = "Assets/"
+else:
+    ASSETS = "_internal/Assets/"
+
 #Se inicia el programa
 init()
 
@@ -62,7 +71,7 @@ resoluciones: list[tuple[int, int]] = [(426, 240), (640, 360), (854, 480), (1280
 # El titulo de la pantalla
 display.set_caption("Space war")
 # El icono de la pantalla
-display.set_icon(image.load("Assets/Icon/icon.png"))
+display.set_icon(image.load(ASSETS + "Icon/icon.png"))
 
 # Pone la pantalla completa si pantalla_completa es true
 if pantalla_completa:
@@ -95,19 +104,19 @@ def mainMenu():
     estrellas = Estrellas(pantalla, 500, anchopantalla, altopantalla)
 
     bg_music = mixer.music
-    bg_music.load("Assets/Music/SkyFire_(Title Screen).ogg")
+    bg_music.load(ASSETS + "Music/SkyFire_(Title Screen).ogg")
     bg_music.play(-1)
     bg_music.set_volume(0.4)
 
-    botonClick = mixer.Sound("Assets/SFX/click.mp3")
-    botonHover = mixer.Sound("Assets/SFX/hoverButton.mp3")
+    botonClick = mixer.Sound(ASSETS + "SFX/click.mp3")
+    botonHover = mixer.Sound(ASSETS + "SFX/hoverButton.mp3")
     botonClick.set_volume(0.6)
     botonHover.set_volume(0.6)
 
     #Fonts
-    fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-    mainMenuFont = font.Font("Assets/Fonts/Vermin_Vibes_1989.ttf", int(tamanoDinamico(altopantalla, 15)))
-    fuente_botones = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 5)))
+    fps_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+    mainMenuFont = font.Font(ASSETS + "Fonts/Vermin_Vibes_1989.ttf", int(tamanoDinamico(altopantalla, 15)))
+    fuente_botones = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 5)))
 
     # Titulo
     mainMenuText = mainMenuFont.render("SPACE WAR", True, WHITE)
@@ -152,7 +161,7 @@ def mainMenu():
                     # Si el cick es en el boton asignado
                     if botonJugar.hover:
                         botonJugar.onClick(Game, True, bg_music, 0.5, estrellas)
-                        bg_music.load("Assets/Music/SkyFire_(Title Screen).ogg")
+                        bg_music.load(ASSETS + "Music/SkyFire_(Title Screen).ogg")
                         bg_music.play(-1)
                         bg_music.set_volume(0.2)
                         
@@ -165,8 +174,8 @@ def mainMenu():
                         anchopantalla, altopantalla = pantalla.get_size()
                 
                         #Resize all the fonts
-                        fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-                        fuente_botones = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 5)))
+                        fps_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+                        fuente_botones = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 5)))
 
                         # Refrescar las estrellas
                         estrellas.refrescar(anchopantalla, altopantalla)
@@ -206,10 +215,10 @@ def Options(estrellas, resoluciones):
 
     
     #Fonts
-    fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-    title_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
-    option_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
-    select_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
+    fps_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+    title_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
+    option_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
+    select_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
 
     #Fps limit Text
     fps_limit_options_text = select_font.render("FPS Limit: ", True, WHITE)
@@ -276,10 +285,10 @@ def Options(estrellas, resoluciones):
                 anchopantalla, altopantalla = pantalla.get_size()
                 
                 #Resize all the fonts
-                fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-                title_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
-                option_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
-                select_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
+                fps_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+                title_font = font.Font(ASSETS +"Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
+                option_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
+                select_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
                 
                 #Resize the manager ui
                 manager_ui = pygame_gui.UIManager(resoluciones[resolucion_index], "themeUI.json")
@@ -314,10 +323,10 @@ def Options(estrellas, resoluciones):
                 anchopantalla, altopantalla = pantalla.get_size()
                 
                 #Resize all the fonts
-                fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-                title_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
-                option_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
-                select_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
+                fps_font = font.Font(ASSETS + "Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+                title_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
+                option_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
+                select_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
                 
                 #Resize the manager ui
                 manager_ui = pygame_gui.UIManager(resoluciones[resolucion_index], "themeUI.json")
@@ -351,10 +360,10 @@ def Options(estrellas, resoluciones):
                 anchopantalla, altopantalla = pantalla.get_size()
                 
                 #Resize all the fonts
-                fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-                title_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
-                option_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
-                select_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
+                fps_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+                title_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
+                option_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
+                select_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
                 
                 #Resize the manager ui
                 manager_ui = pygame_gui.UIManager(resoluciones[resolucion_index], "themeUI.json")
@@ -388,10 +397,10 @@ def Options(estrellas, resoluciones):
                 anchopantalla, altopantalla = pantalla.get_size()
                 
                 #Resize all the fonts
-                fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-                title_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
-                option_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
-                select_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
+                fps_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+                title_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
+                option_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
+                select_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
                 
                 #Resize the manager ui
                 manager_ui = pygame_gui.UIManager(resoluciones[resolucion_index], "themeUI.json")
@@ -425,10 +434,10 @@ def Options(estrellas, resoluciones):
                 anchopantalla, altopantalla = pantalla.get_size()
                 
                 #Resize all the fonts
-                fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-                title_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
-                option_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
-                select_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
+                fps_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+                title_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
+                option_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
+                select_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
 
                 #Resize the manager ui
                 manager_ui = pygame_gui.UIManager(resoluciones[resolucion_index], "themeUI.json")
@@ -468,9 +477,9 @@ def Options(estrellas, resoluciones):
                 anchopantalla, altopantalla = pantalla.get_size()
 
                 #Resize all the fonts
-                title_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
-                option_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
-                select_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
+                title_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 4.34375)))
+                option_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2.34375)))
+                select_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(anchopantalla, 2)))
 
                 #Resize the manager ui
                 manager_ui = pygame_gui.UIManager(resoluciones[resolucion_index], "themeUI.json")
@@ -540,12 +549,12 @@ def Game(estrellas):
 
     #Musica de fondo
     bg_game_music  = mixer.music
-    bg_game_music.load("Assets/Music/Rain_of_Lasers.ogg")
+    bg_game_music.load(ASSETS + "/Music/Rain_of_Lasers.ogg")
     bg_game_music.play(-1)
     bg_game_music.set_volume(0.2)
 
     #Sonidos
-    punch2 = mixer.Sound("Assets/SFX/punch2.wav")
+    punch2 = mixer.Sound(ASSETS + "/SFX/punch2.wav")
     punch2.set_volume(0.5)
     #Grupos
     bullets = sprite.Group()
@@ -558,14 +567,14 @@ def Game(estrellas):
     
     #----------------------------
     #Sprite sheets
-    playerSheet = image.load("Assets/Images/SpaceShip_sheet.png").convert_alpha()
-    bulletsSheet = image.load("Assets/Images/Bullets_sheet.png").convert_alpha()
+    playerSheet = image.load(ASSETS + "/Images/SpaceShip_sheet.png").convert_alpha()
+    bulletsSheet = image.load(ASSETS + "/Images/Bullets_sheet.png").convert_alpha()
     #----------------------------
 
     #Fonts
-    fps_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
-    coins_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 3)))
-    player_lifes_font = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 4)))
+    fps_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 2.5)))
+    coins_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 3)))
+    player_lifes_font = font.Font(ASSETS + "/Fonts/Minecraft.ttf", int(tamanoDinamico(altopantalla, 4)))
 
     #Se guardan todas las balas en un array
     bullet_array = [get_image(bulletsSheet, 0, 24, 24, BLACK),
@@ -594,12 +603,12 @@ def Game(estrellas):
             "enemigo_patron_spray"]
 
     #Objetos
-    player = Player(get_image(playerSheet, 0, 52, 52, BLACK), bullet_array[0], (tamanoDinamico(anchopantalla, 50), tamanoDinamico(altopantalla, 90)), (tamanoDinamico(anchopantalla, 3), tamanoDinamico(anchopantalla, 3)), 3, (anchopantalla, altopantalla))
-    player_life_image = transform.scale(image.load("Assets/Images/heart.png"), (tamanoDinamico(anchopantalla, 3), tamanoDinamico(anchopantalla, 3)))
+    player = Player(ASSETS, get_image(playerSheet, 0, 52, 52, BLACK), bullet_array[0], (tamanoDinamico(anchopantalla, 50), tamanoDinamico(altopantalla, 90)), (tamanoDinamico(anchopantalla, 3), tamanoDinamico(anchopantalla, 3)), 3, (anchopantalla, altopantalla))
+    player_life_image = transform.scale(image.load(ASSETS + "/Images/heart.png"), (tamanoDinamico(anchopantalla, 3), tamanoDinamico(anchopantalla, 3)))
 
     playerCollide = Rect(player.rect.x, player.rect.y, tamanoDinamico(anchopantalla, 0.5), tamanoDinamico(anchopantalla, 0.5))
     playerGroup.add(player)
-    enemyGenerator = EnemyGenerator(enemies, enemyPos, 0, enemyID, bullet_array, "easy", pantalla, (anchopantalla, altopantalla))
+    enemyGenerator = EnemyGenerator(ASSETS, enemies, enemyPos, 0, enemyID, bullet_array, "easy", pantalla, (anchopantalla, altopantalla))
     coins = 0
     screen_shake = 0
     #----------------------------

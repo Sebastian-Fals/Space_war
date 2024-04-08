@@ -7,8 +7,9 @@ from BulletClass import Bullet
 from funciones import tamanoDinamico
 
 class GameEntity(sprite.Sprite):
-    def __init__(self, sprite, bullet_sprite, position, size, vida, screen_size):
+    def __init__(self, path: str, sprite, bullet_sprite, position, size, vida, screen_size):
         super().__init__()
+        self.path: str = path
         self.originalSprite = transform.scale(sprite, size)
         self.image = self.originalSprite
         self.image = transform.scale(self.image, size)
@@ -26,8 +27,8 @@ class GameEntity(sprite.Sprite):
         self.image = transform.scale(self.image, (sizeX, sizeY))
 
 class Player(GameEntity):
-    def __init__(self, sprite, bullet_sprite, position, size, vida, screen_size):
-        super().__init__(sprite, bullet_sprite, position, size, vida, screen_size)
+    def __init__(self, path, sprite, bullet_sprite, position, size, vida, screen_size):
+        super().__init__(path, sprite, bullet_sprite, position, size, vida, screen_size)
         self.velocityX = 0
         self.velocityY = 0
         self.angle = 0
@@ -35,7 +36,7 @@ class Player(GameEntity):
         self.target = "enemies" #Define a quien va a dañar la bala que se spawnea
         self.vida = vida
         self.isDead = False
-        self.shootSound = mixer.Sound("Assets/SFX/laser_beam.mp3")
+        self.shootSound = mixer.Sound(self.path + "SFX/laser_beam.mp3")
         self.shootSound.set_volume(0.3)
 
     def update(self, deltaTime,  mouse_pos, screen_size):
@@ -101,8 +102,8 @@ class Player(GameEntity):
 
 #Esta clase es para todos los tipos de enemigos del juego
 class Enemies(GameEntity):
-    def __init__(self, sprite, bullet_sprite, position, size, vida, screen_size, enemy_id, final_position):
-        super().__init__(sprite, bullet_sprite, position, size, vida, screen_size)
+    def __init__(self, path, sprite, bullet_sprite, position, size, vida, screen_size, enemy_id, final_position):
+        super().__init__(path, sprite, bullet_sprite, position, size, vida, screen_size)
         self.enemy_id = enemy_id
         #Bullet interval sirve para calcular el intervalo de disparo de las balas
         self.bullet_interval = 0
@@ -119,7 +120,7 @@ class Enemies(GameEntity):
         self.canShoot = 0
 
         #Sonido cuando muere
-        self.dedSound = mixer.Sound("Assets/SFX/enemyDying.wav")
+        self.dedSound = mixer.Sound(self.path + "SFX/enemyDying.wav")
         self.dedSound.set_volume(0.3)
 
         self.final_position = final_position
@@ -129,7 +130,7 @@ class Enemies(GameEntity):
     def loadEnemy(self):
         if self.enemy_id == "enemigo_patron_circular":
             #Se configuran las opciones iniciales del enemigo
-            self.image = image.load("Assets/Images/circular_enemy.png").convert_alpha()
+            self.image = image.load(self.path + "Images/circular_enemy.png").convert_alpha()
             self.image = transform.scale(self.image, (tamanoDinamico(self.screen_size[0], 3.125), tamanoDinamico(self.screen_size[0], 3.125)))
             self.rect = self.image.get_rect()
             self.rect.center = self.position
@@ -139,7 +140,7 @@ class Enemies(GameEntity):
             
         if self.enemy_id == "enemigo_patron_circular_alternado":
             #Se configuran las opciones iniciales del enemigo
-            self.image = image.load("Assets/Images/circular_enemy.png").convert_alpha()
+            self.image = image.load(self.path + "Images/circular_enemy.png").convert_alpha()
             self.image = transform.scale(self.image, (tamanoDinamico(self.screen_size[0], 3.125), tamanoDinamico(self.screen_size[0], 3.125)))
             self.rect = self.image.get_rect()
             self.rect.center = self.position
@@ -149,7 +150,7 @@ class Enemies(GameEntity):
 
         if self.enemy_id == "enemigo_patron_espiral":
             #Se configuran las opciones iniciales del enemigo
-            self.image = image.load("Assets/Images/circular_enemy.png").convert_alpha()
+            self.image = image.load(self.path + "Images/circular_enemy.png").convert_alpha()
             self.image = transform.scale(self.image, (tamanoDinamico(self.screen_size[0], 3.125), tamanoDinamico(self.screen_size[0], 3.125)))
             self.rect = self.image.get_rect()
             self.rect.center = self.position
@@ -159,7 +160,7 @@ class Enemies(GameEntity):
         
         if self.enemy_id == "enemigo_patron_espiral_alternado":
             #Se configuran las opciones iniciales del enemigo
-            self.image = image.load("Assets/Images/circular_enemy.png").convert_alpha()
+            self.image = image.load(self.path + "Images/circular_enemy.png").convert_alpha()
             self.image = transform.scale(self.image, (tamanoDinamico(self.screen_size[0], 3.125), tamanoDinamico(self.screen_size[0], 3.125)))
             self.rect = self.image.get_rect()
             self.rect.center = self.position
@@ -169,7 +170,7 @@ class Enemies(GameEntity):
         
         if self.enemy_id == "enemigo_patron_estrella":
             #Se configuran las opciones iniciales del enemigo
-            self.image = image.load("Assets/Images/circular_enemy.png").convert_alpha()
+            self.image = image.load(self.path + "Images/circular_enemy.png").convert_alpha()
             self.image = transform.scale(self.image, (tamanoDinamico(self.screen_size[0], 3.125), tamanoDinamico(self.screen_size[0], 3.125)))
             self.rect = self.image.get_rect()
             self.rect.center = self.position
@@ -179,7 +180,7 @@ class Enemies(GameEntity):
         
         if self.enemy_id == "enemigo_patron_spray":
             #Se configuran las opciones iniciales del enemigo
-            self.image = image.load("Assets/Images/circular_enemy.png").convert_alpha()
+            self.image = image.load(self.path + "Images/circular_enemy.png").convert_alpha()
             self.image = transform.scale(self.image, (tamanoDinamico(self.screen_size[0], 3.125), tamanoDinamico(self.screen_size[0], 3.125)))
             self.rect = self.image.get_rect()
             self.rect.center = self.position

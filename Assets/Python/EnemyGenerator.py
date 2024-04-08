@@ -24,7 +24,8 @@ class SpawnPoint():
         
 
 class EnemyGenerator():
-    def __init__(self, group,  spawnPoints, enemyCount, enemy_IDs, bulletSprite, difficulty, screen, screenSize):
+    def __init__(self, path: str, group,  spawnPoints, enemyCount, enemy_IDs, bulletSprite, difficulty, screen, screenSize):
+        self.path: str = path
         self.screen = screen
         self.screenSize = screenSize
         self.spawnPoints = spawnPoints
@@ -37,7 +38,7 @@ class EnemyGenerator():
         self.enemies_generated = 0  # Contador de enemigos generados
         self.actualwave = 1 #Control de la oleada actual
         self.waveInText = 1
-        self.waveFont = font.Font("Assets/Fonts/Minecraft.ttf", int(tamanoDinamico(self.screenSize[1], 10)))
+        self.waveFont = font.Font(self.path + "Fonts/Minecraft.ttf", int(tamanoDinamico(self.screenSize[1], 10)))
         self.waveText = self.waveFont.render("Wave " + str(self.waveInText), True, (255, 255, 255, 255))
         self.any_spawn_points_occupied = 0
         self.enmeyLife = 5
@@ -73,7 +74,7 @@ class EnemyGenerator():
                     while self.spawnPoints[randomPosition].canSpawn == False:
                         randomPosition = randint(0, (len(self.spawnPoints) - 1))
                     if self.spawnPoints[randomPosition].canSpawn == True:
-                        self.group.add(Enemies(image.load("Assets/Images/circular_enemy.png").convert_alpha(), self.bulletSprite, initialPositions[randomInitialPositions], (40, 40), self.enmeyLife, self.screenSize, self.enemy_IDs[randomID], self.spawnPoints[randomPosition].position))
+                        self.group.add(Enemies(self.path, image.load(self.path + "Images/circular_enemy.png").convert_alpha(), self.bulletSprite, initialPositions[randomInitialPositions], (40, 40), self.enmeyLife, self.screenSize, self.enemy_IDs[randomID], self.spawnPoints[randomPosition].position))
                     tm.sleep(0.5)
                     self.enemies_generated += 1
                     self.waveInText = self.actualwave
